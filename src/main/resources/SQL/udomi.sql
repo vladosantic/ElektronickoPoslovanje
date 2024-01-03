@@ -1,9 +1,9 @@
-CREATE TABLE "Vrsta" (
+CREATE TABLE "vrsta" (
   "id" int PRIMARY KEY,
-  "nazivVrste" varchar
+  "naziv_vrste" varchar
 );
 
-CREATE TABLE "Zivotinja" (
+CREATE TABLE "zivotinja" (
   "id" int PRIMARY KEY,
   "ime" varchar,
   "vrsta_id" int,
@@ -13,58 +13,58 @@ CREATE TABLE "Zivotinja" (
   "slika" varchar
 );
 
-CREATE TABLE "Korisnik" (
+CREATE TABLE "korisnik" (
   "id" int PRIMARY KEY,
   "ime" varchar,
   "prezime" varchar,
   "email" varchar,
   "telefon" varchar,
   "lokacija" varchar,
-  "korisnickoIme" varchar,
+  "korisnicko_ime" varchar,
   "lozinka" varchar,
-  "datumRegistracije" timestamp
+  "datum_registracije" timestamp
 );
 
-CREATE TABLE "Objava" (
+CREATE TABLE "objava" (
   "id" int PRIMARY KEY,
   "korisnik_id" int NOT NULL,
   "zivotinja_id" int NOT NULL,
   "lokacija_id" int NOT NULL,
-  "tekstObjave" text,
-  "datumObjave" timestamp
+  "tekst_objave" text,
+  "datum_objave" timestamp
 );
 
-CREATE TABLE "Rezervacija" (
+CREATE TABLE "rezervacija" (
   "id" int PRIMARY KEY,
   "korisnik_udomitelj_id" int NOT NULL,
   "korisnik_skrbnik_id" int NOT NULL,
   "zivotinja_id" int NOT NULL,
-  "datumRezervacije" timestamp
+  "datum_rezervacije" timestamp
 );
 
-CREATE TABLE "Uloga" (
+CREATE TABLE "uloga" (
   "id" int PRIMARY KEY,
   "naziv" varchar
 );
 
-CREATE TABLE "Recenzija" (
+CREATE TABLE "recenzija" (
   "id" int PRIMARY KEY,
   "korisnik_recezent_id" int NOT NULL,
   "korisnik_id" int NOT NULL,
-  "tekstRecenzije" varchar,
+  "tekst_recenzije" varchar,
   "ocjena" int,
-  "datumRecenzije" timestamp
+  "datum_recenzije" timestamp
 );
 
-CREATE TABLE "Komentar" (
+CREATE TABLE "komentar" (
   "id" int PRIMARY KEY,
   "objava_id" int NOT NULL,
   "korisnik_id" int NOT NULL,
-  "tekstKomentara" varchar,
-  "datumKomentara" timestamp
+  "tekst_komentara" varchar,
+  "datum_komentara" timestamp
 );
 
-CREATE TABLE "Lokacija" (
+CREATE TABLE "lokacija" (
   "id" int PRIMARY KEY,
   "naziv" varchar,
   "adresa" varchar,
@@ -72,34 +72,34 @@ CREATE TABLE "Lokacija" (
   "drzava" varchar
 );
 
-CREATE TABLE "Korisnik_Uloga" (
+CREATE TABLE "korisnik_uloga" (
   "id" int PRIMARY KEY,
   "korisnik_id" int NOT NULL,
   "uloga_id" int
 );
 
-ALTER TABLE "Zivotinja" ADD FOREIGN KEY ("vrsta_id") REFERENCES "Vrsta" ("id");
+ALTER TABLE "zivotinja" ADD FOREIGN KEY ("vrsta_id") REFERENCES "vrsta" ("id");
 
-ALTER TABLE "Objava" ADD FOREIGN KEY ("korisnik_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "objava" ADD FOREIGN KEY ("korisnik_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Objava" ADD FOREIGN KEY ("zivotinja_id") REFERENCES "Zivotinja" ("id");
+ALTER TABLE "objava" ADD FOREIGN KEY ("zivotinja_id") REFERENCES "zivotinja" ("id");
 
-ALTER TABLE "Objava" ADD FOREIGN KEY ("lokacija_id") REFERENCES "Lokacija" ("id");
+ALTER TABLE "objava" ADD FOREIGN KEY ("lokacija_id") REFERENCES "lokacija" ("id");
 
-ALTER TABLE "Rezervacija" ADD FOREIGN KEY ("korisnik_udomitelj_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "rezervacija" ADD FOREIGN KEY ("korisnik_udomitelj_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Rezervacija" ADD FOREIGN KEY ("korisnik_skrbnik_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "rezervacija" ADD FOREIGN KEY ("korisnik_skrbnik_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Rezervacija" ADD FOREIGN KEY ("zivotinja_id") REFERENCES "Zivotinja" ("id");
+ALTER TABLE "rezervacija" ADD FOREIGN KEY ("zivotinja_id") REFERENCES "zivotinja" ("id");
 
-ALTER TABLE "Recenzija" ADD FOREIGN KEY ("korisnik_recezent_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "recenzija" ADD FOREIGN KEY ("korisnik_recezent_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Recenzija" ADD FOREIGN KEY ("korisnik_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "recenzija" ADD FOREIGN KEY ("korisnik_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Komentar" ADD FOREIGN KEY ("objava_id") REFERENCES "Objava" ("id");
+ALTER TABLE "komentar" ADD FOREIGN KEY ("objava_id") REFERENCES "objava" ("id");
 
-ALTER TABLE "Komentar" ADD FOREIGN KEY ("korisnik_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "komentar" ADD FOREIGN KEY ("korisnik_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Korisnik_Uloga" ADD FOREIGN KEY ("korisnik_id") REFERENCES "Korisnik" ("id");
+ALTER TABLE "korisnik_uloga" ADD FOREIGN KEY ("korisnik_id") REFERENCES "korisnik" ("id");
 
-ALTER TABLE "Korisnik_Uloga" ADD FOREIGN KEY ("uloga_id") REFERENCES "Uloga" ("id");
+ALTER TABLE "korisnik_uloga" ADD FOREIGN KEY ("uloga_id") REFERENCES "uloga" ("id");
