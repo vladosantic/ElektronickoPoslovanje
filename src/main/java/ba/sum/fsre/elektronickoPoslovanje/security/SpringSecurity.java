@@ -25,9 +25,15 @@ public class SpringSecurity {
         return new BCryptPasswordEncoder();
     }
 
+    /*
+    *
+    * TEMPORARILY DISABLED FOR DEVELOPMENT PURPOSES
+    *
+    * */
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+       /* http.csrf().disable()
                 .authorizeHttpRequests((authorize) ->
                         authorize.requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/index").permitAll()
@@ -43,13 +49,14 @@ public class SpringSecurity {
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                 .permitAll()
                 );
-        return http.build();
+        return http.build();*/
+        return null;
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
+//        auth
+//                .userDetailsService(userDetailsService)
+//                .passwordEncoder(passwordEncoder());
     }
 }
