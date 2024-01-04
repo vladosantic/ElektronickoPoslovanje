@@ -16,7 +16,7 @@ public class VrstaController {
     private VrstaService vrstaService;
 
     @PostMapping
-    public VrstaEntity createUser(@RequestBody VrstaEntity vrsta) {
+    public VrstaEntity createVrsta(@RequestBody VrstaEntity vrsta) {
         return vrstaService.create(vrsta);
     }
 
@@ -31,12 +31,12 @@ public class VrstaController {
     }
 
     @PutMapping("/{id}")
-    public VrstaEntity updateUser(@PathVariable Integer id, @RequestBody VrstaEntity vrsta) {
+    public VrstaEntity updateVrsta(@PathVariable Integer id, @RequestBody VrstaEntity vrsta) {
         return vrstaService.update(vrsta);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Integer id) {
+    public void deleteVrsta(@PathVariable Integer id) {
         vrstaService.delete(id);
     }
 }
