@@ -2,22 +2,24 @@ package ba.sum.fsre.elektronickoPoslovanje.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "vrsta", schema = "public", catalog = "udomi")
 public class VrstaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
     @Basic
     @Column(name = "naziv_vrste", nullable = true, length = -1)
     private String nazivVrste;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -36,15 +38,13 @@ public class VrstaEntity {
 
         VrstaEntity that = (VrstaEntity) o;
 
-        if (id != that.id) return false;
-        if (nazivVrste != null ? !nazivVrste.equals(that.nazivVrste) : that.nazivVrste != null) return false;
-
-        return true;
+        if (!id.equals(that.id)) return false;
+        return Objects.equals(nazivVrste, that.nazivVrste);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id.hashCode();
         result = 31 * result + (nazivVrste != null ? nazivVrste.hashCode() : 0);
         return result;
     }

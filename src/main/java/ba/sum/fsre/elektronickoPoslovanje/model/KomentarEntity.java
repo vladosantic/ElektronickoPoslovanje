@@ -3,6 +3,7 @@ package ba.sum.fsre.elektronickoPoslovanje.model;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
 @Table(name = "komentar", schema = "public", catalog = "udomi")
@@ -10,7 +11,7 @@ public class KomentarEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
 
     @Basic
     @Column(name = "tekst_komentara", nullable = true, length = -1)
@@ -21,17 +22,17 @@ public class KomentarEntity {
 
     @ManyToOne
     @JoinColumn(name = "korisnik_id")
-    private KorisnikEntity korisnikId;
+    private UserEntity korisnikId;
 
     @ManyToOne
     @JoinColumn(name = "objava_id")
     private ObjavaEntity objavaId;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,11 +52,11 @@ public class KomentarEntity {
         this.datumKomentara = datumKomentara;
     }
 
-    public KorisnikEntity getKorisnikId() {
+    public UserEntity getKorisnikId() {
         return korisnikId;
     }
 
-    public void setKorisnikId(KorisnikEntity korisnikId) {
+    public void setKorisnikId(UserEntity korisnikId) {
         this.korisnikId = korisnikId;
     }
 
@@ -74,20 +75,22 @@ public class KomentarEntity {
 
         KomentarEntity that = (KomentarEntity) o;
 
-        if (id != that.id) return false;
-        if (!tekstKomentara.equals(that.tekstKomentara)) return false;
-        if (!datumKomentara.equals(that.datumKomentara)) return false;
-        if (!korisnikId.equals(that.korisnikId)) return false;
-        return objavaId.equals(that.objavaId);
+        if (!id.equals(that.id)) return false;
+        if (!Objects.equals(tekstKomentara, that.tekstKomentara))
+            return false;
+        if (!Objects.equals(datumKomentara, that.datumKomentara))
+            return false;
+        if (!Objects.equals(korisnikId, that.korisnikId)) return false;
+        return Objects.equals(objavaId, that.objavaId);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + tekstKomentara.hashCode();
-        result = 31 * result + datumKomentara.hashCode();
-        result = 31 * result + korisnikId.hashCode();
-        result = 31 * result + objavaId.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + (tekstKomentara != null ? tekstKomentara.hashCode() : 0);
+        result = 31 * result + (datumKomentara != null ? datumKomentara.hashCode() : 0);
+        result = 31 * result + (korisnikId != null ? korisnikId.hashCode() : 0);
+        result = 31 * result + (objavaId != null ? objavaId.hashCode() : 0);
         return result;
     }
 }

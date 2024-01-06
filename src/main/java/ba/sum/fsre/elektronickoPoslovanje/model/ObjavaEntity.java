@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 @Table(name = "objava", schema = "public", catalog = "udomi")
@@ -11,7 +12,7 @@ public class ObjavaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
     @Basic
     @Column(name = "tekst_objave", nullable = true, length = -1)
     private String tekstObjave;
@@ -23,7 +24,7 @@ public class ObjavaEntity {
 
     @ManyToOne
     @JoinColumn(name = "korisnik_id", nullable = false)
-    private KorisnikEntity korisnikId;
+    private UserEntity korisnikId;
 
     @ManyToOne
     @JoinColumn(name = "lokacija_id", referencedColumnName = "id", nullable = false)
@@ -32,11 +33,11 @@ public class ObjavaEntity {
     @JoinColumn(name = "zivotinja_id", referencedColumnName = "id", nullable = false)
     private ZivotinjaEntity zivotinjaId;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -64,11 +65,11 @@ public class ObjavaEntity {
         this.komentarId = komentarId;
     }
 
-    public KorisnikEntity getKorisnikId() {
+    public UserEntity getKorisnikId() {
         return korisnikId;
     }
 
-    public void setKorisnikId(KorisnikEntity korisnikId) {
+    public void setKorisnikId(UserEntity korisnikId) {
         this.korisnikId = korisnikId;
     }
 
@@ -95,24 +96,24 @@ public class ObjavaEntity {
 
         ObjavaEntity that = (ObjavaEntity) o;
 
-        if (id != that.id) return false;
-        if (!tekstObjave.equals(that.tekstObjave)) return false;
-        if (!datumObjave.equals(that.datumObjave)) return false;
-        if (!komentarId.equals(that.komentarId)) return false;
-        if (!korisnikId.equals(that.korisnikId)) return false;
-        if (!lokacijaId.equals(that.lokacijaId)) return false;
-        return zivotinjaId.equals(that.zivotinjaId);
+        if (!id.equals(that.id)) return false;
+        if (!Objects.equals(tekstObjave, that.tekstObjave)) return false;
+        if (!Objects.equals(datumObjave, that.datumObjave)) return false;
+        if (!Objects.equals(komentarId, that.komentarId)) return false;
+        if (!Objects.equals(korisnikId, that.korisnikId)) return false;
+        if (!Objects.equals(lokacijaId, that.lokacijaId)) return false;
+        return Objects.equals(zivotinjaId, that.zivotinjaId);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + tekstObjave.hashCode();
-        result = 31 * result + datumObjave.hashCode();
-        result = 31 * result + komentarId.hashCode();
-        result = 31 * result + korisnikId.hashCode();
-        result = 31 * result + lokacijaId.hashCode();
-        result = 31 * result + zivotinjaId.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + (tekstObjave != null ? tekstObjave.hashCode() : 0);
+        result = 31 * result + (datumObjave != null ? datumObjave.hashCode() : 0);
+        result = 31 * result + (komentarId != null ? komentarId.hashCode() : 0);
+        result = 31 * result + (korisnikId != null ? korisnikId.hashCode() : 0);
+        result = 31 * result + (lokacijaId != null ? lokacijaId.hashCode() : 0);
+        result = 31 * result + (zivotinjaId != null ? zivotinjaId.hashCode() : 0);
         return result;
     }
 }

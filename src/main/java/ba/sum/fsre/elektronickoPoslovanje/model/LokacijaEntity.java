@@ -2,13 +2,15 @@ package ba.sum.fsre.elektronickoPoslovanje.model;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "lokacija", schema = "public", catalog = "udomi")
 public class LokacijaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
     @Basic
     @Column(name = "naziv", nullable = true, length = -1)
     private String naziv;
@@ -22,11 +24,11 @@ public class LokacijaEntity {
     @Column(name = "drzava", nullable = true, length = -1)
     private String drzava;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -69,18 +71,16 @@ public class LokacijaEntity {
 
         LokacijaEntity that = (LokacijaEntity) o;
 
-        if (id != that.id) return false;
-        if (naziv != null ? !naziv.equals(that.naziv) : that.naziv != null) return false;
-        if (adresa != null ? !adresa.equals(that.adresa) : that.adresa != null) return false;
-        if (grad != null ? !grad.equals(that.grad) : that.grad != null) return false;
-        if (drzava != null ? !drzava.equals(that.drzava) : that.drzava != null) return false;
-
-        return true;
+        if (!id.equals(that.id)) return false;
+        if (!Objects.equals(naziv, that.naziv)) return false;
+        if (!Objects.equals(adresa, that.adresa)) return false;
+        if (!Objects.equals(grad, that.grad)) return false;
+        return Objects.equals(drzava, that.drzava);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id.hashCode();
         result = 31 * result + (naziv != null ? naziv.hashCode() : 0);
         result = 31 * result + (adresa != null ? adresa.hashCode() : 0);
         result = 31 * result + (grad != null ? grad.hashCode() : 0);

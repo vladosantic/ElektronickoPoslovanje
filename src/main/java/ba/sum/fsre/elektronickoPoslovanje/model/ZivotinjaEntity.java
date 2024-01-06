@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Objects;
 
 @Entity
 @Table(name = "zivotinja", schema = "public", catalog = "udomi")
@@ -11,7 +12,7 @@ public class ZivotinjaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private int id;
+    private Long id;
     @Basic
     @Column(name = "ime", nullable = true, length = -1)
     private String ime;
@@ -35,11 +36,11 @@ public class ZivotinjaEntity {
     @JoinColumn(name = "vrsta_id", referencedColumnName = "id")
     private VrstaEntity vrstaId;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -114,28 +115,29 @@ public class ZivotinjaEntity {
 
         ZivotinjaEntity that = (ZivotinjaEntity) o;
 
-        if (id != that.id) return false;
-        if (!ime.equals(that.ime)) return false;
-        if (!godine.equals(that.godine)) return false;
-        if (!velicina.equals(that.velicina)) return false;
-        if (!tezina.equals(that.tezina)) return false;
-        if (!slika.equals(that.slika)) return false;
-        if (!objavaId.equals(that.objavaId)) return false;
-        if (!rezervacijaId.equals(that.rezervacijaId)) return false;
-        return vrstaId.equals(that.vrstaId);
+        if (!id.equals(that.id)) return false;
+        if (!Objects.equals(ime, that.ime)) return false;
+        if (!Objects.equals(godine, that.godine)) return false;
+        if (!Objects.equals(velicina, that.velicina)) return false;
+        if (!Objects.equals(tezina, that.tezina)) return false;
+        if (!Objects.equals(slika, that.slika)) return false;
+        if (!Objects.equals(objavaId, that.objavaId)) return false;
+        if (!Objects.equals(rezervacijaId, that.rezervacijaId))
+            return false;
+        return Objects.equals(vrstaId, that.vrstaId);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + ime.hashCode();
-        result = 31 * result + godine.hashCode();
-        result = 31 * result + velicina.hashCode();
-        result = 31 * result + tezina.hashCode();
-        result = 31 * result + slika.hashCode();
-        result = 31 * result + objavaId.hashCode();
-        result = 31 * result + rezervacijaId.hashCode();
-        result = 31 * result + vrstaId.hashCode();
+        int result = id.hashCode();
+        result = 31 * result + (ime != null ? ime.hashCode() : 0);
+        result = 31 * result + (godine != null ? godine.hashCode() : 0);
+        result = 31 * result + (velicina != null ? velicina.hashCode() : 0);
+        result = 31 * result + (tezina != null ? tezina.hashCode() : 0);
+        result = 31 * result + (slika != null ? slika.hashCode() : 0);
+        result = 31 * result + (objavaId != null ? objavaId.hashCode() : 0);
+        result = 31 * result + (rezervacijaId != null ? rezervacijaId.hashCode() : 0);
+        result = 31 * result + (vrstaId != null ? vrstaId.hashCode() : 0);
         return result;
     }
 }
