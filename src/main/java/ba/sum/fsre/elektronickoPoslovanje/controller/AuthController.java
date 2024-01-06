@@ -1,7 +1,7 @@
 package ba.sum.fsre.elektronickoPoslovanje.controller;
 
 import ba.sum.fsre.elektronickoPoslovanje.dto.UserDto;
-import ba.sum.fsre.elektronickoPoslovanje.model.User;
+import ba.sum.fsre.elektronickoPoslovanje.model.UserEntity;
 import ba.sum.fsre.elektronickoPoslovanje.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -49,7 +49,7 @@ public class AuthController {
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
                                Model model){
-        User existingUser = userService.findUserByEmail(userDto.getEmail());
+        UserEntity existingUser = userService.findUserByEmail(userDto.getEmail());
 
         if(existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
             result.rejectValue("email", null,

@@ -3,6 +3,7 @@ package ba.sum.fsre.elektronickoPoslovanje.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,19 +26,17 @@ public class SpringSecurity {
         return new BCryptPasswordEncoder();
     }
 
-    /*
-    *
-    * TEMPORARILY DISABLED FOR DEVELOPMENT PURPOSES
-    *
-    * */
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       /* http.csrf().disable()
-                .authorizeHttpRequests((authorize) ->
+        http.csrf().disable()
+                .authorizeRequests((authorize) ->
                         authorize.requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/index").permitAll()
                                 .requestMatchers("/users").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
                 ).formLogin(
                         form -> form
                                 .loginPage("/login")
@@ -49,14 +48,13 @@ public class SpringSecurity {
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                 .permitAll()
                 );
-        return http.build();*/
-        return null;
+        return http.build();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//                .userDetailsService(userDetailsService)
-//                .passwordEncoder(passwordEncoder());
+        auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
     }
 }
