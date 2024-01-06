@@ -1,7 +1,7 @@
 package ba.sum.fsre.elektronickoPoslovanje.service;
 
-import ba.sum.fsre.elektronickoPoslovanje.model.Role;
-import ba.sum.fsre.elektronickoPoslovanje.model.User;
+import ba.sum.fsre.elektronickoPoslovanje.model.RoleEntity;
+import ba.sum.fsre.elektronickoPoslovanje.model.UserEntity;
 import ba.sum.fsre.elektronickoPoslovanje.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        UserEntity user = userRepository.findByEmail(email);
 
         if (user != null) {
             return new org.springframework.security.core.userdetails.User(user.getEmail(),
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
 
-    private Collection < ? extends GrantedAuthority> mapRolesToAuthorities(Collection <Role> roles) {
+    private Collection < ? extends GrantedAuthority> mapRolesToAuthorities(Collection <RoleEntity> roles) {
         Collection < ? extends GrantedAuthority> mapRoles = roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());

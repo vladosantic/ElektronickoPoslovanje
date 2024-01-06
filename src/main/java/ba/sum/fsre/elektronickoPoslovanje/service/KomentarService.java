@@ -3,6 +3,7 @@ package ba.sum.fsre.elektronickoPoslovanje.service;
 import ba.sum.fsre.elektronickoPoslovanje.dto.KomentarDto;
 import ba.sum.fsre.elektronickoPoslovanje.model.KomentarEntity;
 import ba.sum.fsre.elektronickoPoslovanje.repository.KomentarRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class KomentarService {
         this.komentarRepository = komentarRepository;
     }
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     public List<KomentarDto> findAllDtos() {
         List<KomentarEntity> komentarEntities = komentarRepository.findAll();
         return komentarEntities.stream()
@@ -34,11 +38,9 @@ public class KomentarService {
 
     private KomentarDto convertToDto(KomentarEntity komentarEntity) {
         KomentarDto komentarDto = new KomentarDto();
-        komentarDto.setId(komentarEntity.getId());
-        komentarDto.setTekstKomentara(komentarEntity.getTekstKomentara());
-        komentarDto.setDatumKomentara(komentarEntity.getDatumKomentara());
-        komentarDto.setKorisnikId(komentarEntity.getKorisnikId().getId());
-        komentarDto.setObjavaId(komentarEntity.getObjavaId().getId());
+        komentarDto = modelMapper.map(komentarEntity, KomentarDto.class);
+        komentarDto.setImePrezime(komentarEntity.getKorisnikId().getName());
+
         return komentarDto;
     }
 
