@@ -3,18 +3,27 @@ package ba.sum.fsre.elektronickoPoslovanje.dto;
 import java.sql.Timestamp;
 
 public class KomentarDto {
-    private int id;
+    private Long id;
+    private String imePrezime;
     private String tekstKomentara;
     private Timestamp datumKomentara;
-    private int korisnikId;
-    private int objavaId;
+    private Long korisnikId;
+    private Long objavaId;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getImePrezime() {
+        return imePrezime;
+    }
+
+    public void setImePrezime(String imePrezime) {
+        this.imePrezime = imePrezime;
     }
 
     public String getTekstKomentara() {
@@ -33,19 +42,19 @@ public class KomentarDto {
         this.datumKomentara = datumKomentara;
     }
 
-    public int getKorisnikId() {
+    public Long getKorisnikId() {
         return korisnikId;
     }
 
-    public void setKorisnikId(int korisnikId) {
+    public void setKorisnikId(Long korisnikId) {
         this.korisnikId = korisnikId;
     }
 
-    public int getObjavaId() {
+    public Long getObjavaId() {
         return objavaId;
     }
 
-    public void setObjavaId(int objavaId) {
+    public void setObjavaId(Long objavaId) {
         this.objavaId = objavaId;
     }
 }
