@@ -64,8 +64,8 @@ public class ObjavaService {
         return objavaRepository.findById(id);
     }
 
-    public ObjavaEntity update(ObjavaEntity ObjavaEntityToUpdate) {
-        return objavaRepository.save(ObjavaEntityToUpdate);
+    public ObjavaDto update(ObjavaEntity ObjavaEntityToUpdate) {
+        return convertToDto(objavaRepository.save(ObjavaEntityToUpdate));
     }
 
     public void delete(int id) {

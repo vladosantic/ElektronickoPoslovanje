@@ -32,7 +32,7 @@ public class KomentarController {
 }
 
     @PutMapping("/{id}")
-    public KomentarEntity updateKomentar(@PathVariable Integer id, @RequestBody KomentarEntity komentar) {
+    public KomentarDto updateKomentar(@PathVariable Integer id, @RequestBody KomentarEntity komentar) {
         return komentarService.update(komentar);
     }
 

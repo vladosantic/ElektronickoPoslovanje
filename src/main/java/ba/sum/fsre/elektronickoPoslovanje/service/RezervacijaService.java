@@ -64,8 +64,8 @@ public class RezervacijaService {
         return rezervacijaRepository.findById(id);
     }
 
-    public RezervacijaEntity update(RezervacijaEntity RezervacijaEntityToUpdate) {
-        return rezervacijaRepository.save(RezervacijaEntityToUpdate);
+    public RezervacijaDto update(RezervacijaEntity RezervacijaEntityToUpdate) {
+        return convertToDto(rezervacijaRepository.save(RezervacijaEntityToUpdate));
     }
 
     public void delete(int id) {

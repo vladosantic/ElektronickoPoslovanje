@@ -32,7 +32,7 @@ public class RezervacijaController {
     }
 
     @PutMapping("/{id}")
-    public RezervacijaEntity updateRezervacija(@PathVariable Integer id, @RequestBody RezervacijaEntity rezervacija) {
+    public RezervacijaDto updateRezervacija(@PathVariable Integer id, @RequestBody RezervacijaEntity rezervacija) {
         return rezervacijaService.update(rezervacija);
     }
 

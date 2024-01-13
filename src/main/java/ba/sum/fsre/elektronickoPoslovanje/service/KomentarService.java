@@ -60,8 +60,8 @@ public class KomentarService {
         return komentarRepository.findById(id);
     }
 
-    public KomentarEntity update(KomentarEntity KomentarEntityToUpdate) {
-        return komentarRepository.save(KomentarEntityToUpdate);
+    public KomentarDto update(KomentarEntity KomentarEntityToUpdate) {
+        return convertToDto(komentarRepository.save(KomentarEntityToUpdate));
     }
 
     public void delete(int id) {

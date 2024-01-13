@@ -32,7 +32,7 @@ public class RecenzijaController {
     }
 
     @PutMapping("/{id}")
-    public RecenzijaEntity updateRecenzija(@PathVariable Integer id, @RequestBody RecenzijaEntity recenzija) {
+    public RecenzijaDto updateRecenzija(@PathVariable Integer id, @RequestBody RecenzijaEntity recenzija) {
         return recenzijaService.update(recenzija);
     }
 

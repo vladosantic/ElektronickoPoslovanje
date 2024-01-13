@@ -32,7 +32,7 @@ public class ObjavaController {
     }
 
     @PutMapping("/{id}")
-    public ObjavaEntity updateObjava(@PathVariable Integer id, @RequestBody ObjavaEntity objava) {
+    public ObjavaDto updateObjava(@PathVariable Integer id, @RequestBody ObjavaEntity objava) {
         return objavaService.update(objava);
     }
 

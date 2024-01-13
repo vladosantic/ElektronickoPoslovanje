@@ -62,8 +62,8 @@ public class RecenzijaService {
         return recenzijaRepository.findById(id);
     }
 
-    public RecenzijaEntity update(RecenzijaEntity RecenzijaEntityToUpdate) {
-        return recenzijaRepository.save(RecenzijaEntityToUpdate);
+    public RecenzijaDto update(RecenzijaEntity RecenzijaEntityToUpdate) {
+        return convertToDto(recenzijaRepository.save(RecenzijaEntityToUpdate));
     }
 
     public void delete(int id) {
