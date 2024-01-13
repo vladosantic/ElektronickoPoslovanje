@@ -1,13 +1,11 @@
 package ba.sum.fsre.elektronickoPoslovanje.dto;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 public class ObjavaDto {
     private Long id;
     private String tekstObjave;
     private Timestamp datumObjave;
-    private Collection<KomentarDto> komentarId;
     private Long korisnikId;
     private String imePrezime;
     private Long lokacijaId;
@@ -37,14 +35,6 @@ public class ObjavaDto {
 
     public void setDatumObjave(Timestamp datumObjave) {
         this.datumObjave = datumObjave;
-    }
-
-    public Collection<KomentarDto> getKomentarId() {
-        return komentarId;
-    }
-
-    public void setKomentarId(Collection<KomentarDto> komentarId) {
-        this.komentarId = komentarId;
     }
 
     public Long getKorisnikId() {

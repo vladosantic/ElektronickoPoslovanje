@@ -19,8 +19,6 @@ public class ObjavaEntity {
     @Basic
     @Column(name = "datum_objave", nullable = true)
     private Timestamp datumObjave;
-    @OneToMany(mappedBy = "objavaId")
-    private Collection<KomentarEntity> komentarId;
 
     @ManyToOne
     @JoinColumn(name = "korisnik_id", nullable = false)
@@ -57,14 +55,6 @@ public class ObjavaEntity {
         this.datumObjave = datumObjave;
     }
 
-    public Collection<KomentarEntity> getKomentarId() {
-        return komentarId;
-    }
-
-    public void setKomentarId(Collection<KomentarEntity> komentarId) {
-        this.komentarId = komentarId;
-    }
-
     public UserEntity getKorisnikId() {
         return korisnikId;
     }
@@ -99,7 +89,6 @@ public class ObjavaEntity {
         if (!id.equals(that.id)) return false;
         if (!Objects.equals(tekstObjave, that.tekstObjave)) return false;
         if (!Objects.equals(datumObjave, that.datumObjave)) return false;
-        if (!Objects.equals(komentarId, that.komentarId)) return false;
         if (!Objects.equals(korisnikId, that.korisnikId)) return false;
         if (!Objects.equals(lokacijaId, that.lokacijaId)) return false;
         return Objects.equals(zivotinjaId, that.zivotinjaId);
@@ -110,7 +99,6 @@ public class ObjavaEntity {
         int result = id.hashCode();
         result = 31 * result + (tekstObjave != null ? tekstObjave.hashCode() : 0);
         result = 31 * result + (datumObjave != null ? datumObjave.hashCode() : 0);
-        result = 31 * result + (komentarId != null ? komentarId.hashCode() : 0);
         result = 31 * result + (korisnikId != null ? korisnikId.hashCode() : 0);
         result = 31 * result + (lokacijaId != null ? lokacijaId.hashCode() : 0);
         result = 31 * result + (zivotinjaId != null ? zivotinjaId.hashCode() : 0);
