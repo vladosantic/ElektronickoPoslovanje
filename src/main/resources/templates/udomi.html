@@ -24,6 +24,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <!-- jQuery (required for Bootstrap's JS) via CDN -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
 
 </head>
 <body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
@@ -67,10 +69,89 @@
 <div class="container">
 
 
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <h1>Objave</h1>
 
-</div>
+        <!-- Button to Add Posts -->
+        <a class="btn btn-warning mb-3" th:href="@{/dodaj}">Dodaj objavu</a>
+
+        <!-- Styled Post List -->
+        <div id="postList" class="list-group mt-3">
+            <div class="list-group-item mb-3">
+                <h5 class="mb-1">Post Title 1</h5>
+                <p class="mb-1">Post Content 1</p>
+            </div>
+            <div class="list-group-item mb-3">
+                <h5 class="mb-1">Post Title 2</h5>
+                <p class="mb-1">Post Content 2</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        // Function to format the time difference
+        function formatTimeDifference(timeDifference) {
+            const seconds = Math.floor(timeDifference / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (seconds < 60) {
+                return `prije ${seconds} sekundi`;
+            } else if (minutes < 60) {
+                return `prije ${minutes} minuta`;
+            } else if (hours < 24) {
+                return `prije ${hours} sati`;
+            } else if (days <= 30) {
+                return `prije ${days} dana`;
+            } else {
+                // Default to formatted date if more than 30 days
+                return new java.text.SimpleDateFormat("dd.MM.yyyy").format(timeDifference);
+            }
+        }
+
+        // Function to display posts
+        function displayPosts(posts) {
+            // Sort posts by date in descending order
+            posts.sort((a, b) => new Date(b.datumObjave) - new Date(a.datumObjave));
+
+            const postList = document.getElementById('postList');
+            postList.innerHTML = ''; // Clear previous posts
+
+            posts.forEach(post => {
+                const postItem = document.createElement('a');
+                postItem.href = '#';
+                postItem.classList.add('list-group-item', 'list-group-item-action', 'mb-3', 'rounded');
+
+                const now = new Date();
+                const postDate = new Date(post.datumObjave);
+                const timeDifference = now - postDate;
+
+                postItem.innerHTML = `
+                <h5 class="mb-1">${post.imePrezime}</h5>
+                <p class="mb-1">${post.tekstObjave}</p>
+                <small>${formatTimeDifference(timeDifference)}</small>
+            `;
+
+                postList.appendChild(postItem);
+            });
+        }
+
+        // Fetch initial data from the API
+        fetch('http://localhost:8080/api/objava')
+            .then(response => response.json())
+            .then(data => {
+                displayPosts(data);
+                const posts = data; // Save the initial posts
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
 <!--Footer-->
-
+</div>
 <footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">
 
     <div class="container text-center p-3" >
@@ -79,6 +160,7 @@
     </div>
 
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
 <!-- Popper.js (required for Bootstrap's JS) via CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>

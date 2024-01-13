@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udomi</title>
+    <link rel="icon" th:href="@{/images/tablogo.png}" />
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>udomi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Optional: You can also include Bootstrap's JavaScript and dependencies if needed -->
+    <!-- Bootstrap JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <!-- Popper.js (required for Bootstrap's JS) via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <!-- jQuery (required for Bootstrap's JS) via CDN -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+    <script>
+        function getCurrentDateTime() {
+            const now = new Date();
+            const formattedDateTime = now.toISOString().slice(0, 16).replace("T", " ");
+            return formattedDateTime;
+        }
+
+
+        async function fetchZivotinjeAndLokacije() {
+            try {
+                const zivotinjeResponse = await fetch('http://localhost:8080/api/zivotinja');
+                const lokacijeResponse = await fetch('http://localhost:8080/api/lokacija');
+
+                const zivotinjeData = await zivotinjeResponse.json();
+                const lokacijeData = await lokacijeResponse.json();
+
+                populateDropdown('zivotinjaId', zivotinjeData, 'ime');
+                populateDropdown('lokacijaId', lokacijeData, 'naziv');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function populateDropdown(elementId, data, property) {
+            const dropdown = document.getElementById(elementId);
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.text = item[property];
+                dropdown.add(option);
+            });
+        }
+
+        async function submitForm() {
+            const form = document.getElementById('objavaForm');
+            const formData = new FormData(form);
+
+            // Convert FormData to JSON
+            const jsonObject = {};
+            formData.forEach((value, key) => {
+                if (key === 'zivotinjaId' || key === 'lokacijaId') {
+                    // Convert 'zivotinjaId' and 'lokacijaId' to an object with 'id' property
+                    jsonObject[key] = { id: Number(value) };
+                } else if (key === 'datumObjave') {
+                    // Convert string to Timestamp if the key is 'datumObjave'
+                    const date = new Date(value);
+                    jsonObject[key] = date.toISOString(); // Format date as ISO string
+                } else {
+                    jsonObject[key] = value;
+                }
+            });
+
+            try {
+                // Dynamically get the logged-in user ID
+                const loggedInUserId = await fetchLoggedInUserId();
+
+                // Add the logged-in user id to the JSON payload
+                jsonObject['korisnikId'] = { id: Number(loggedInUserId) };
+
+                const response = await fetch('http://localhost:8080/api/objava', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonObject),
+                });
+
+                if (response.ok) {
+                    // Redirect to "http://localhost:8080/udomi"
+                    window.location.href = 'http://localhost:8080/udomi';
+                } else {
+                    console.error('Error submitting form:', response.statusText);
+                    const responseBody = await response.json(); // Try to get more details from the response body
+                    console.error('Response body:', responseBody);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            }
+        }
+
+        async function fetchLoggedInUserId() {
+            try {
+                // Make a request to fetch the logged-in user ID
+                const response = await fetch('http://localhost:8080/api/loggedInUserId');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.userId;
+                } else {
+                    throw new Error('Error fetching logged-in user ID');
+                }
+            } catch (error) {
+                console.error('Error fetching logged-in user ID:', error);
+                throw error;
+            }
+        }
+
+        window.onload = function () {
+            fetchZivotinjeAndLokacije();
+
+            // Set current date and time to the timestamp input field
+            document.getElementById('datumObjave').value = getCurrentDateTime();
+
+
+        }
+    </script>
+
+</head>
+<body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container">
+
+        <!-- Logo/Brand -->
+        <a class="navbar-brand" href="/index">
+            <img th:src="@{/images/udomilogo.png}" alt="Logo" height="45" class="d-inline-block align-top">
+        </a>
+
+        <!-- Navbar Toggler for mobile -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}"><strong>Početna</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/udomi}"><strong>Udomi</strong></a>
+                </li>
+            </ul>
+
+            <!-- Displaying Logged User's Name and Logout -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}"><strong>Odjava</strong></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="container">
+
+    <div class="container">
+        <form id="objavaForm">
+
+            <!-- Text input for tekstObjave -->
+            <div class="mb-3">
+                <label for="tekstObjave" class="form-label">Tekst Objave</label>
+                <textarea class="form-control" id="tekstObjave" name="tekstObjave" required></textarea>
+            </div>
+
+            <!-- Other input fields for relationships like korisnikId, lokacijaId, zivotinjaId -->
+            <div class="mb-3">
+                <label for="zivotinjaId" class="form-label">Zivotinja</label>
+                <select class="form-select" id="zivotinjaId" name="zivotinjaId" required>
+                    <!-- Options will be dynamically added here -->
+                </select>
+            </div>
+            <input type="hidden" th:value="${loggedInUserId}" id="korisnikId" name="korisnikId">
+            <div class="mb-3">
+                <label for="lokacijaId" class="form-label">Lokacija</label>
+                <select class="form-select" id="lokacijaId" name="lokacijaId" required>
+                    <!-- Options will be dynamically added here -->
+                </select>
+            </div>
+
+            <!-- Other input fields for relationships like korisnikId -->
+
+            <!-- Submit button -->
+            <button type="button" class="btn btn-warning" onclick="submitForm()">Submit</button>
+
+        </form>
+    </div>
+
+
+</div>
+<!--Footer-->
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig fixed-bottom">
+    <div class="container text-center p-3">
+        © 2024 Copyright:
+        <a class="text-light" href="/index">udomi.ba</a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<!-- Popper.js (required for Bootstrap's JS) via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<!-- jQuery (required for Bootstrap's JS) via CDN -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+</body>
+</html>

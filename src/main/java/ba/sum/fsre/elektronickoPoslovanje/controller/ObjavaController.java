@@ -2,10 +2,14 @@ package ba.sum.fsre.elektronickoPoslovanje.controller;
 
 import ba.sum.fsre.elektronickoPoslovanje.dto.ObjavaDto;
 import ba.sum.fsre.elektronickoPoslovanje.model.ObjavaEntity;
+import ba.sum.fsre.elektronickoPoslovanje.model.UserEntity;
+import ba.sum.fsre.elektronickoPoslovanje.repository.UserRepository;
 import ba.sum.fsre.elektronickoPoslovanje.service.ObjavaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,11 +17,18 @@ import java.util.Optional;
 @RequestMapping("/api/objava")
 public class ObjavaController {
 
+
+
     @Autowired
     private ObjavaService objavaService;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @PostMapping
     public ObjavaEntity createObjava(@RequestBody ObjavaEntity objava) {
+
+        objava.setDatumObjave(new Timestamp(System.currentTimeMillis()));
         return objavaService.create(objava);
     }
 
