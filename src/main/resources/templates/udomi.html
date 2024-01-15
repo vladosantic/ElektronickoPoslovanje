@@ -25,6 +25,15 @@
     <!-- jQuery (required for Bootstrap's JS) via CDN -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Include SockJS and Stomp.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.2/dist/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
+"></script>
+
+
 
 
 </head>
@@ -149,7 +158,30 @@
                 const posts = data; // Save the initial posts
             })
             .catch(error => console.error('Error:', error));
+
+        function isUserAtTop() {
+            return window.scrollY === 0;
+        }
+
+        const socket = new SockJS('http://localhost:8080/ws-endpoint');
+        const stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/objavaUpdates', function (update) {
+                const objava = JSON.parse(update.body);
+                // Handle the received objava, e.g., update the UI
+                fetch('http://localhost:8080/api/objava')
+                    .then(response => response.json())
+                    .then(data => {
+                        displayPosts(data);
+                        const posts = data; // Save the initial posts
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+
     </script>
+
 <!--Footer-->
 </div>
 <footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">

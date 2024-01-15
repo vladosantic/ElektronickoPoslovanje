@@ -22,14 +22,22 @@ public class ObjavaController {
     @Autowired
     private ObjavaService objavaService;
     @Autowired
-    private UserRepository userRepository;
+    private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private WebSocketController webSocketController;
 
 
     @PostMapping
     public ObjavaEntity createObjava(@RequestBody ObjavaEntity objava) {
 
         objava.setDatumObjave(new Timestamp(System.currentTimeMillis()));
-        return objavaService.create(objava);
+
+        ObjavaEntity createdObjava = objavaService.create(objava);
+
+        // Send WebSocket update to "/topic/objavaUpdates"
+        simpMessagingTemplate.convertAndSend("/topic/objavaUpdates", createdObjava);
+
+        return createdObjava;
     }
 
     @GetMapping
