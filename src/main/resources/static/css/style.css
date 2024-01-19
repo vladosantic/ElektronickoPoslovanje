@@ -1,0 +1,17 @@
+
+    /* Styles for the custom notification */
+    .custom-notification {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        width: 300px;
+        background-color: #4CAF50; /* Green background color */
+        color: white; /* White text color */
+        padding: 15px; /* Padding */
+        text-align: center; /* Center text */
+        cursor: pointer; /* Add a pointer cursor on hover */
+        z-index: 1000; /* Set a high z-index to make sure it appears on top */
+        border-radius: 5px; /* Add rounded corners */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+    }
+
