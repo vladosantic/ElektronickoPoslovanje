@@ -2,6 +2,7 @@ package ba.sum.fsre.elektronickoPoslovanje.controller;
 
 import ba.sum.fsre.elektronickoPoslovanje.model.UserEntity;
 import ba.sum.fsre.elektronickoPoslovanje.repository.UserRepository;
+import ba.sum.fsre.elektronickoPoslovanje.service.ObjavaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -21,6 +23,9 @@ public class PutanjeController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    private ObjavaService objavaService;
 
     @GetMapping("/udomi")
     public String udomi(){
@@ -54,5 +59,27 @@ public class PutanjeController {
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @GetMapping("/objava/{id}")
+    public String prikazObjavu(@PathVariable Long id, Model model) {
+
+
+        // Dodaj objavu u model kako bi je prikazali na stranici
+        model.addAttribute("objavaId", id);
+
+
+        return "objava/prikazObjave";
+    }
+
+    @GetMapping("/objava/uredjivanje/{id}")
+    public String uredjivanjeObjavu(@PathVariable Long id, Model model) {
+
+
+        // Dodaj objavu u model kako bi je prikazali na stranici
+        model.addAttribute("objavaId", id);
+
+
+        return "objava/uredjivanjeObjave";
     }
 }

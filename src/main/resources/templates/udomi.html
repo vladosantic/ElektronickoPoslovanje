@@ -150,7 +150,7 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 
             posts.forEach(post => {
                 const postItem = document.createElement('a');
-                postItem.href = '#';
+                postItem.href = '/objava/' + post.id;
                 postItem.classList.add('list-group-item', 'list-group-item-action', 'mb-3', 'rounded');
 
                 const now = new Date();
