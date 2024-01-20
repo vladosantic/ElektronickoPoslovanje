@@ -82,4 +82,26 @@ public class PutanjeController {
 
         return "objava/uredjivanjeObjave";
     }
+
+    @GetMapping("/zivotinje")
+    public String prikazZivotinja() {
+
+
+        return "zivotinje/zivotinje";
+    }
+    @GetMapping("/zivotinja/dodaj")
+    public String dodajZivotinja() {
+
+
+        return "zivotinje/dodajZivotinju";
+    }
+    @GetMapping("/zivotinja/uredi/{id}")
+    public String uredjivanjeZivotinja(@PathVariable Long id, Model model) {
+
+        model.addAttribute("objavaId", id);
+
+
+        return "zivotinje/uredi";
+    }
+
 }

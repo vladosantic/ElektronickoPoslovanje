@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udomi</title>
+    <link rel="icon" th:href="@{/images/tablogo.png}" />
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>udomi</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Optional: You can also include Bootstrap's JavaScript and dependencies if needed -->
+    <!-- Bootstrap JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <!-- Popper.js (required for Bootstrap's JS) via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <!-- jQuery (required for Bootstrap's JS) via CDN -->
+
+
+</head>
+<body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container">
+
+        <!-- Logo/Brand -->
+        <a class="navbar-brand" href="/index">
+            <img th:src="@{/images/udomilogo.png}" alt="Logo" height="45" class="d-inline-block align-top">
+        </a>
+
+        <!-- Navbar Toggler for mobile -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}"><strong>Početna</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/udomi}"><strong>Udomi</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/zivotinje}"><strong>Životinje</strong></a>
+                </li>
+            </ul>
+
+            <!-- Displaying Logged User's Name and Logout -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}"><strong>Odjava</strong></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="container">
+    <!-- Display list of animals -->
+    <div id="animalList" class="mt-5">
+        <h2>Lista Životinja</h2>
+        <a class="btn btn-warning" th:href="@{/zivotinja/dodaj}">Dodaj novu životinju</a>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Ime</th>
+                <th scope="col">Vrsta</th>
+                <th scope="col">Godine</th>
+                <th scope="col">Veličina</th>
+                <th scope="col">Težina</th>
+                <th scope="col">Akcije</th>
+
+            </tr>
+            </thead>
+            <tbody id="animalTableBody">
+            <!-- Animal data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Button to add a new animal -->
+
+</div>
+
+<!--Footer-->
+
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">
+
+    <div class="container text-center p-3" >
+        © 2024 Copyright:
+        <a class="text-light" href="/index">udomi.ba</a>
+    </div>
+
+</footer>
+<script>
+    // Fetch animal data from the API
+    fetch('http://localhost:8080/api/zivotinja')
+        .then(response => response.json())
+        .then(data => displayAnimalList(data));
+
+    // Function to display the list of animals
+    function displayAnimalList(animalData) {
+        const animalTableBody = document.getElementById('animalTableBody');
+
+        animalData.forEach(animal => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${animal.ime}</td>
+                <td>${animal.nazivVrste}</td>
+                <td>${animal.godine}</td>
+                <td>${animal.velicina}</td>
+                <td>${animal.tezina}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editAnimal(${animal.id})">Uredi</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteAnimal(${animal.id})">Obriši</button>
+                </td>
+
+            `;
+            animalTableBody.appendChild(row);
+        });
+    }
+    function deleteAnimal(animalId) {
+        // Confirm dialog to confirm the deletion
+        if (confirm('Jeste li sigurni da želite obrisati ovu životinju?')) {
+            // Send DELETE request
+            fetch(`http://localhost:8080/api/zivotinja/${animalId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload()
+                    } else {
+
+                        alert('Postoji već objavljen oglas s ovom životinjom. Prvo obrišite oglas.');
+
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+    function editAnimal(id) {
+        // Konstruiraj URL za uređivanje životinje
+        var editUrl = 'http://localhost:8080/zivotinja/uredi/' + id;
+
+        // Preusmjeri na određeni URL
+        window.location.href = editUrl;
+    }
+
+</script>
+
+
+
+</body>
+</html>
