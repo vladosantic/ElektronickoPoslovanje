@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udomi</title>
+    <link rel="icon" th:href="@{/images/tablogo.png}" />
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <!-- Bootstrap JS, Popper.js, and jQuery via CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        window.onload = async function () {
+            await fetchZivotinjeAndLokacije();
+
+            var objavaId = [[${objavaId}]];
+            if (objavaId) {
+                await populateFormForUpdate(objavaId);
+            } else {
+                console.log("Ne mogu dohvatiti ID objave")
+            }
+        }
+
+
+        async function fetchZivotinjeAndLokacije() {
+            try {
+                const zivotinjeResponse = await fetch('http://localhost:8080/api/zivotinja');
+                const lokacijeResponse = await fetch('http://localhost:8080/api/lokacija');
+
+                const zivotinjeData = await zivotinjeResponse.json();
+                const lokacijeData = await lokacijeResponse.json();
+
+                populateDropdown('zivotinjaId', zivotinjeData, 'ime');
+                populateDropdown('lokacijaId', lokacijeData, 'naziv');
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function populateDropdown(elementId, data, property) {
+            const dropdown = document.getElementById(elementId);
+
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.text = item[property];
+                dropdown.add(option);
+            });
+        }
+
+        async function submitForm() {
+            const form = document.getElementById('objavaForm');
+            const formData = new FormData(form);
+
+            const jsonObject = {};
+            formData.forEach((value, key) => {
+                if (key === 'zivotinjaId' || key === 'lokacijaId') {
+                    jsonObject[key] = { id: Number(value) };
+                } else if (key === 'datumObjave') {
+                    const date = new Date(value);
+                    jsonObject[key] = date.toISOString();
+                } else {
+                    jsonObject[key] = value;
+                }
+            });
+
+            try {
+                const korisnikIdInput = document.getElementById('korisnikId');
+                const korisnikIdValue = korisnikIdInput.value;
+
+                jsonObject['korisnikId'] = { id: Number(korisnikIdValue) };
+
+                const objavaId = document.getElementById('id').value;
+                console.log(objavaId);
+
+                let url, method;
+                if (objavaId) {
+                    // Ako postoji objavaId, koristi PUT za ažuriranje
+                    url = `http://localhost:8080/api/objava/${objavaId}`;
+                    method = 'PUT';
+
+                    // Check if 'datumObjave' is present in the form data
+                    if (!formData.has('datumObjave')) {
+                        // If not present, add the current date to the JSON payload
+                        jsonObject['datumObjave'] = new Date().toISOString();
+                    }
+                } else {
+                    console.error("Nije moguće kreirati novu objavu s ovom funkcijom.");
+                    return;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonObject),
+                });
+
+                if (response.ok) {
+                    window.location.href = `http://localhost:8080/objava/${objavaId}`;
+                } else {
+                    console.error('Error submitting form:', response.statusText);
+                    const responseBody = await response.json();
+                    console.error('Response body:', responseBody);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            }
+        }
+
+
+        async function fetchLoggedInUserId() {
+            try {
+                // Make a request to fetch the logged-in user ID
+                const response = await fetch('http://localhost:8080/api/loggedInUserId');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.userId;
+                } else {
+                    throw new Error('Error fetching logged-in user ID');
+                }
+            } catch (error) {
+                console.error('Error fetching logged-in user ID:', error);
+                throw error;
+            }
+        }
+
+        async function populateFormForUpdate(objavaId) {
+            try {
+                // Dohvati podatke o objavi putem Fetch API-ja
+                const objavaResponse = await fetch(`http://localhost:8080/api/objava/${objavaId}`);
+                const objavaData = await objavaResponse.json();
+
+                // Popuni formu s podacima postojeće objave
+                document.getElementById('tekstObjave').value = objavaData.tekstObjave;
+                document.getElementById('korisnikId').value = objavaData.korisnikId;
+                document.getElementById('id').value = objavaData.id;
+                setZivotinjaDropdownValue(objavaData.zivotinjaId);
+                setLokacijaDropdownValue(objavaData.lokacijaId);
+                // Ako postoji datumObjave, postavi ga
+                if (objavaData.datumObjave) {
+                    const date = new Date(objavaData.datumObjave);
+                    console.log('Formatted datumObjave:', date.toISOString().slice(0, 16).replace("T", " "));
+                    document.getElementById('datumObjave').value = date.toISOString().slice(0, 16).replace("T", " ");
+                }
+            } catch (error) {
+                console.error('Error fetching existing data for update:', error);
+            }
+        }
+
+
+
+        function setZivotinjaDropdownValue(selectedZivotinjaId) {
+            const zivotinjaDropdown = document.getElementById('zivotinjaId');
+            setSelectedOption(zivotinjaDropdown, selectedZivotinjaId);
+        }
+
+        function setLokacijaDropdownValue(selectedLokacijaId) {
+            const lokacijaDropdown = document.getElementById('lokacijaId');
+            setSelectedOption(lokacijaDropdown, selectedLokacijaId);
+        }
+
+        function setSelectedOption(dropdown, selectedValue) {
+            for (let i = 0; i < dropdown.options.length; i++) {
+                if (dropdown.options[i].value == selectedValue) {
+                    dropdown.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+    </script>
+
+</head>
+
+<body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container">
+        <a class="navbar-brand" href="/index">
+            <img th:src="@{/images/udomilogo.png}" alt="Logo" height="45" class="d-inline-block align-top">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}"><strong>Početna</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/udomi}"><strong>Udomi</strong></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}"><strong>Odjava</strong></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="container">
+    <div class="container">
+        <!-- Forma za dodavanje i uređivanje objave -->
+        <form id="objavaForm" th:action="@{/api/objava}" th:object="${objava}" method="post">
+
+            <!-- Tekst objave -->
+            <div class="mb-3">
+                <label for="tekstObjave" class="form-label">Tekst Objave</label>
+                <textarea class="form-control" id="tekstObjave" name="tekstObjave" required></textarea>
+            </div>
+
+            <!-- Dropdown za zivotinje -->
+            <div class="mb-3">
+                <label for="zivotinjaId" class="form-label">Zivotinja</label>
+                <select class="form-select" id="zivotinjaId" name="zivotinjaId" required>
+                    <!-- Opcije će biti dinamički dodane ovdje -->
+                </select>
+            </div>
+
+            <!-- Hidden input za korisnikId -->
+            <input type="hidden" id="korisnikId" name="korisnikId">
+
+            <!-- Hidden input za Id -->
+            <input type="hidden" id="id" name="id">
+
+            <!-- Dropdown za lokacije -->
+            <div class="mb-3">
+                <label for="lokacijaId" class="form-label">Lokacija</label>
+                <select class="form-select" id="lokacijaId" name="lokacijaId" required>
+                    <!-- Opcije će biti dinamički dodane ovdje -->
+                </select>
+            </div>
+
+            <!-- Hidden input za objavaId ako postoji -->
+            <input type="hidden" th:value="${objavaId}" id="objavaId" name="objavaId">
+
+            <!-- Datum objave -->
+            <div class="mb-3">
+                <input type="hidden" class="form-control" id="datumObjave" name="datumObjave" required>
+            </div>
+
+            <!-- Gumb za slanje forme -->
+            <button type="button" class="btn btn-warning" onclick="submitForm()">Ažuriraj objavu</button>
+
+        </form>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig fixed-bottom">
+    <div class="container text-center p-3">
+        © 2024 Copyright:
+        <a class="text-light" href="/index">udomi.ba</a>
+    </div>
+</footer>
+
+</body>
+
+</html>
