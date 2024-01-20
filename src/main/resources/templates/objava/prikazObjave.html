@@ -135,31 +135,12 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
             <label>Datum objave:</label>
             <p id="datumObjave"></p>
         </div>
-        <button id="updateButton" class="btn btn-warning mr-2">Ažuriraj objavu</button>
-        <button id="deleteButton" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Obriši objavu</button>
+        <button id="updateButton" class="btn btn-warning mr-2" style="display: none;">Ažuriraj objavu</button>
+        <button id="deleteButton" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal" style="display: none;">Obriši objavu</button>
     </div>
 
 
-    <!-- Modal za potvrdu brisanja -->
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Potvrda brisanja</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Jeste li sigurni da želite obrisati objavu?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Odustani</button>
-                    <button id="confirmDeleteButton" type="button" class="btn btn-danger">Obriši</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
     </div>
 
     <!-- Skripta za dohvat i prikaz podataka o objavi -->
@@ -183,7 +164,16 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
         // Dohvati podatke o objavi putem Fetch API-ja
         fetch("http://localhost:8080/api/objava/" + objavaId)
             .then(response => response.json())
-            .then(data => {
+            .then(async data => {
+                const loggedInUserId = await fetchLoggedInUserId();
+                const updateButton = document.getElementById("updateButton");
+                const deleteButton = document.getElementById("deleteButton");
+
+                if (loggedInUserId === data.korisnikId) {
+                    updateButton.style.display = "inline-block";
+                    deleteButton.style.display = "inline-block";
+                }
+
                 // Izračunaj razliku između trenutnog vremena i data.datumObjave
                 const currentTime = new Date().getTime();
                 const timeDifference = currentTime - new Date(data.datumObjave).getTime();
@@ -197,8 +187,9 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
                 document.getElementById("imePrezime").innerText = data.imePrezime;
                 document.getElementById("datumObjave").innerText = formattedTimeDifference;
 
+
                 // Dodaj event listener na delete dugme
-                document.getElementById("deleteButton").addEventListener("click", function() {
+                document.getElementById("deleteButton").addEventListener("click", function () {
                     // Prikaži potvrdu prije brisanja
                     var confirmDelete = confirm("Jeste li sigurni da želite obrisati ovu objavu?");
                     if (confirmDelete) {
@@ -217,7 +208,7 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
                             .catch(error => console.error("Error:", error));
                     }
                 });
-                document.getElementById("updateButton").addEventListener("click", function() {
+                document.getElementById("updateButton").addEventListener("click", function () {
                     // Generiraj URL za uređivanje objave s odgovarajućim ID-om
                     var editUrl = "http://localhost:8080/objava/uredjivanje/" + objavaId;
 
@@ -246,6 +237,22 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
         } else {
             // Default to formatted date if more than 30 days
             return new java.text.SimpleDateFormat("dd.MM.yyyy").format(timeDifference);
+        }
+    }
+    async function fetchLoggedInUserId() {
+        try {
+            // Make a request to fetch the logged-in user ID
+            const response = await fetch('http://localhost:8080/api/loggedInUserId');
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.userId;
+            } else {
+                throw new Error('Error fetching logged-in user ID');
+            }
+        } catch (error) {
+            console.error('Error fetching logged-in user ID:', error);
+            throw error;
         }
     }
 </script>
