@@ -129,13 +129,14 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 
     <div id="objava-container">
         <h1 id="naslov"></h1>
+
+        <div class="label-container">
+            <label>Ime životinje:</label>
+            <p id="imeZivotinje"></p>
+        </div>
         <div class="label-container">
             <label>Lokacija:</label>
             <p id="imeLokacije"></p>
-        </div>
-        <div class="label-container">
-            <label>Vrsta životinje:</label>
-            <p id="imeZivotinje"></p>
         </div>
         <div class="label-container">
             <label>Ime autora:</label>
@@ -145,6 +146,23 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
             <label>Datum objave:</label>
             <p id="datumObjave"></p>
         </div>
+        <div class="row mt-3">
+            <!-- Prva polovica: Informacije o životinji -->
+            <div class="col-md-6">
+                <div id="zivotinja-info" style="display: none;">
+
+                    <!-- Dodajte HTML za prikaz informacija o životinji -->
+                </div>
+            </div>
+
+            <!-- Druga polovica: Informacije o lokaciji -->
+            <div class="col-md-6">
+                <div id="lokacija-info" style="display: none;">
+
+                    <!-- Dodajte HTML za prikaz informacija o lokaciji -->
+                </div>
+            </div>
+        </div>
         <button id="updateButton" class="btn btn-warning mr-2" style="display: none;">Ažuriraj objavu</button>
         <button id="deleteButton" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal" style="display: none;">Obriši objavu</button>
     </div>
@@ -153,7 +171,7 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 
     </div>
 
-    <!-- Skripta za dohvat i prikaz podataka o objavi -->
+
 
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
@@ -196,6 +214,13 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
                 document.getElementById("imeZivotinje").innerText = data.imeZivotinje;
                 document.getElementById("imePrezime").innerText = data.imePrezime;
                 document.getElementById("datumObjave").innerText = formattedTimeDifference;
+                document.getElementById("imeZivotinje").innerHTML += `
+                <button class="btn btn-outline-warning btn-sm ml-2" onclick="prikaziZivotinjuInfo(${data.zivotinjaId})">Više informacija</button>
+`;
+                document.getElementById("imeLokacije").innerHTML += `
+                <button class="btn btn-outline-warning btn-sm ml-2" onClick="prikaziLokacijuInfo(${data.lokacijaId})">Više
+                    informacija</button>`;
+
 
 
                 // Dodaj event listener na delete dugme
@@ -230,6 +255,7 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
             })
             .catch(error => console.error("Error:", error));
     });
+
     function formatTimeDifference(timeDifference) {
         const seconds = Math.floor(timeDifference / 1000);
         const minutes = Math.floor(seconds / 60);
@@ -265,6 +291,59 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
             throw error;
         }
     }
+
+    function prikaziZivotinjuInfo(zivotinjaId) {
+
+        const zivotinjaInfoElement = document.getElementById("zivotinja-info");
+        const currentDisplayStyle = window.getComputedStyle(zivotinjaInfoElement).display;// Postavi suprotnu vrijednost
+        zivotinjaInfoElement.style.display = (currentDisplayStyle === "block") ? "none" : "block";
+
+        if(window.getComputedStyle(zivotinjaInfoElement).display === "block"){
+        // Dohvaćanje podataka o životinji putem Fetch API-ja
+        fetch(`http://localhost:8080/api/zivotinja/${zivotinjaId}`)
+            .then(response => response.json())
+            .then(zivotinjaData => {
+                // Prikazivanje informacija o životinji
+                document.getElementById("zivotinja-info").innerHTML = `
+                <h1>Informacije o životinji</h1>
+                <p><b>Ime</b>: ${zivotinjaData.ime}</p>
+                <p><b>Godine:</b> ${zivotinjaData.godine}</p>
+                <p><b>Veličina:</b> ${zivotinjaData.velicina}</p>
+                <p><b>Težina:</b> ${zivotinjaData.tezina} kg</p>
+                <p><b>Vrsta:</b> ${zivotinjaData.nazivVrste}</p>
+            `;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    }
+    function prikaziLokacijuInfo(lokacijaId) {
+        // Prikazivanje kontejnera za informacije o lokaciji
+        const lokacijaInfoElement = document.getElementById("lokacija-info");
+        const currentDisplayStyle = window.getComputedStyle(lokacijaInfoElement).display;// Postavi suprotnu vrijednost
+        lokacijaInfoElement.style.display = (currentDisplayStyle === "block") ? "none" : "block";
+
+        if(window.getComputedStyle(lokacijaInfoElement).display === "block"){
+
+        // Dohvaćanje podataka o lokaciji putem Fetch API-ja
+        fetch(`http://localhost:8080/api/lokacija/${lokacijaId}`)
+            .then(response => response.json())
+            .then(lokacijaData => {
+                const lokacijaInfoElement = document.getElementById("lokacija-info");
+
+                // Prikazi informacije o lokaciji
+                lokacijaInfoElement.innerHTML = `
+                <h1>Informacije o lokaciji</h1>
+                <p><b>Naziv:</b> ${lokacijaData.naziv}</p>
+                <p><b>Adresa:</b> ${lokacijaData.adresa}</p>
+                <p><b>Grad:</b> ${lokacijaData.grad}</p>
+                <p><b>Država:</b> ${lokacijaData.drzava}</p>
+            `;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    }
+
+
 </script>
 
 

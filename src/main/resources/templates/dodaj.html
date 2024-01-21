@@ -189,14 +189,16 @@
         <form id="objavaForm">
 
             <!-- Text input for tekstObjave -->
-            <div class="mb-3">
-                <label for="tekstObjave" class="form-label">Tekst Objave</label>
-                <textarea class="form-control" id="tekstObjave" name="tekstObjave" required></textarea>
-            </div>
 
-            <!-- Other input fields for relationships like korisnikId, lokacijaId, zivotinjaId -->
+
+
             <div class="mb-3">
-                <label for="zivotinjaId" class="form-label">Zivotinja</label>
+                <a class="btn btn-warning" th:href="@{/zivotinja/dodaj}">Dodaj</a>
+                <label for="zivotinjaId" class="form-label"> sve informacije o životinji</label>
+
+            </div>
+            <div class="mb-3">
+                <label for="zivotinjaId" class="form-label">Odaberi dodanu životinju</label>
                 <select class="form-select" id="zivotinjaId" name="zivotinjaId" required>
                     <!-- Options will be dynamically added here -->
                 </select>
@@ -207,6 +209,10 @@
                 <select class="form-select" id="lokacijaId" name="lokacijaId" required>
                     <!-- Options will be dynamically added here -->
                 </select>
+            </div>
+            <div class="mb-3">
+                <label for="tekstObjave" class="form-label">Tekst Objave</label>
+                <textarea class="form-control" id="tekstObjave" name="tekstObjave" required></textarea>
             </div>
 
             <!-- Other input fields for relationships like korisnikId -->
