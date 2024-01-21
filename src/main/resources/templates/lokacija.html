@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration and Login System</title>
+    <link th:href="@{static/css/style.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>udomi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Optional: You can also include Bootstrap's JavaScript and dependencies if needed -->
+    <!-- Bootstrap JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <!-- Popper.js (required for Bootstrap's JS) via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <!-- jQuery (required for Bootstrap's JS) via CDN -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Include SockJS and Stomp.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.2/dist/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
+"></script>
+    <style>
+
+        /* Stilizacija tablice */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        /* Stilizacija headera tablice */
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Stilizacija redaka tablice */
+        td, th {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        /* Boja redaka na hover */
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Promjena kursora na hover iznad redaka */
+        tr:hover {
+            cursor: pointer;
+        }
+
+
+    </style>
+
+
+
+</head>
+<body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container">
+
+        <!-- Logo/Brand -->
+        <a class="navbar-brand" href="/index">
+            <img th:src="@{/images/udomilogo.png}" alt="Logo" height="45" class="d-inline-block align-top">
+        </a>
+
+        <!-- Navbar Toggler for mobile -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}"><strong>Početna</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/udomi}"><strong>Udomi</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/zivotinje}"><strong>Životinje</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/vrsta}"><strong>Vrsta</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/lokacija}"><strong>Lokacija</strong></a>
+                </li>
+            </ul>
+
+            <!-- Displaying Logged User's Name and Logout -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}"><strong>Odjava</strong></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="container mt-5">
+    <h2>Lokacije</h2>
+
+    <!-- Tablica za prikaz lokacija -->
+
+    <table id="lokacije-tablica" class="table table-striped table-hover"></table>
+
+
+
+    <!-- Forma za dodavanje/ažuriranje -->
+    <form id="lokacija-forma" class="mt-3">
+        <div class="form-group">
+            <label for="nazivLokacije">Naziv lokacije:</label>
+            <input type="text" class="form-control" id="nazivLokacije" required>
+            <input type="hidden" class="form-control" id="idLokacije">
+        </div>
+        <div class="form-group">
+            <label for="adresa">Adresa:</label>
+            <input type="text" class="form-control" id="adresa" required>
+        </div>
+        <div class="form-group">
+            <label for="grad">Grad:</label>
+            <input type="text" class="form-control" id="grad" required>
+        </div>
+        <div class="form-group">
+            <label for="drzava">Država:</label>
+            <input type="text" class="form-control" id="drzava" required>
+        </div>
+        <button type="button" class="btn btn-success" onclick="dodajLokaciju()">Dodaj</button>
+        <button type="button" class="btn btn-warning" onclick="azurirajLokaciju()">Ažuriraj</button>
+        <button type="button" class="btn btn-danger" onclick="obrisiLokaciju()">Obriši</button>
+    </form>
+</div>
+
+<!-- Footer -->
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">
+    <div class="container text-center p-3">
+        © 2024 Copyright:
+        <a class="text-light" href="/index">udomi.ba</a>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function prikaziLokacije() {
+        fetch('http://localhost:8080/api/lokacija')
+            .then(response => response.json())
+            .then(data => {
+                const lokacijeTable = document.getElementById('lokacije-tablica');
+                lokacijeTable.innerHTML = ''; // Očisti tablicu prije dodavanja novih podataka
+
+                // Dodajte redak s nazivima stupaca
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = `
+                <th>Naziv</th>
+                <th>Adresa</th>
+                <th>Grad</th>
+                <th>Država</th>
+            `;
+                lokacijeTable.appendChild(headerRow);
+
+                // Dodajte redak za svaku lokaciju
+                data.forEach(lokacija => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${lokacija.naziv}</td>
+                    <td>${lokacija.adresa}</td>
+                    <td>${lokacija.grad}</td>
+                    <td>${lokacija.drzava}</td>
+                `;
+
+                    // Dodajte event listener za popunjavanje forme
+                    row.addEventListener('click', () => {
+                        popuniLokacijuFormu(lokacija.id);
+                    });
+
+                    lokacijeTable.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Greška pri dohvaćanju lokacija:', error));
+    }
+
+
+
+    function popuniLokacijuFormu(id) {
+        fetch(`http://localhost:8080/api/lokacija/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('nazivLokacije').value = data.naziv;
+                document.getElementById('adresa').value = data.adresa;
+                document.getElementById('grad').value = data.grad;
+                document.getElementById('drzava').value = data.drzava;
+                document.getElementById('idLokacije').value = data.id;
+            })
+            .catch(error => console.error('Greška pri dohvaćanju lokacije za uređivanje:', error));
+    }
+
+    function dodajLokaciju() {
+        const nazivLokacije = document.getElementById('nazivLokacije').value;
+        const adresa = document.getElementById('adresa').value;
+        const grad = document.getElementById('grad').value;
+        const drzava = document.getElementById('drzava').value;
+
+        fetch('http://localhost:8080/api/lokacija', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ naziv: nazivLokacije, adresa, grad, drzava }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Lokacija dodana:', data);
+                document.getElementById('nazivLokacije').value = '';
+                document.getElementById('adresa').value = '';
+                document.getElementById('grad').value = '';
+                document.getElementById('drzava').value = '';
+                document.getElementById('idLokacije').value = '';
+                prikaziLokacije();
+            })
+            .catch(error => console.error('Greška pri dodavanju lokacije:', error));
+    }
+
+    function azurirajLokaciju() {
+        const nazivLokacije = document.getElementById('nazivLokacije').value;
+        const adresa = document.getElementById('adresa').value;
+        const grad = document.getElementById('grad').value;
+        const drzava = document.getElementById('drzava').value;
+        const id = document.getElementById('idLokacije').value;
+
+        if (!nazivLokacije) {
+            alert('Unesite naziv lokacije.');
+            return;
+        }
+
+        const formData = {
+            id: parseInt(id),
+            naziv: nazivLokacije,
+            adresa,
+            grad,
+            drzava,
+        };
+
+        fetch(`http://localhost:8080/api/lokacija/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('nazivLokacije').value = '';
+                    document.getElementById('adresa').value = '';
+                    document.getElementById('grad').value = '';
+                    document.getElementById('drzava').value = '';
+                    document.getElementById('idLokacije').value = '';
+                    prikaziLokacije();
+                } else {
+                    console.error('Greška pri ažuriranju lokacije:', response.status);
+                    alert('Pogreška prilikom ažuriranja lokacije.');
+                }
+            })
+            .catch(error => {
+                console.error('Greška pri ažuriranju lokacije:', error);
+                alert('Pogreška prilikom ažuriranja lokacije.');
+            });
+    }
+
+    function obrisiLokaciju() {
+        const potvrda = confirm('Jeste li sigurni da želite obrisati ovu lokaciju?');
+        const id = document.getElementById('idLokacije').value;
+
+        if (potvrda) {
+            fetch(`http://localhost:8080/api/lokacija/${id}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Lokacija obrisana');
+                        document.getElementById('nazivLokacije').value = '';
+                        document.getElementById('adresa').value = '';
+                        document.getElementById('grad').value = '';
+                        document.getElementById('drzava').value = '';
+                        document.getElementById('idLokacije').value = '';
+                        prikaziLokacije();
+                    } else {
+                        console.error('Greška pri brisanju lokacije:', response.status);
+                        alert('Pogreška pri brisanju lokacije.');
+                    }
+                })
+                .catch(error => console.error('Greška pri brisanju lokacije:', error));
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', prikaziLokacije);
+</script>
+
+
+</body>
+</html>
