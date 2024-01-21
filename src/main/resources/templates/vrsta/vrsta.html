@@ -32,7 +32,37 @@
     <script src="
 https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 "></script>
+<style>
+    /* Stilizacija tablice */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
 
+    /* Stilizacija headera tablice */
+    th {
+        background-color: #f2f2f2;
+    }
+
+    /* Stilizacija redaka tablice */
+    td, th {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    /* Boja redaka na hover */
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Promjena kursora na hover iznad redaka */
+    tr:hover {
+        cursor: pointer;
+    }
+
+</style>
 
 
 </head>
@@ -67,6 +97,9 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/vrsta}"><strong>Vrsta</strong></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/lokacija}"><strong>Lokacija</strong></a>
+                </li>
             </ul>
 
             <!-- Displaying Logged User's Name and Logout -->
@@ -83,8 +116,8 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 <div class="container mt-5">
     <h2>Vrste Životinja</h2>
 
-    <!-- Lista vrsta -->
-    <ul id="vrste-lista" class="list-group mb-3"></ul>
+    <table id="vrste-tabela" class="table table-hover"></table>
+
 
 
 
@@ -120,25 +153,40 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
         fetch('http://localhost:8080/api/vrsta')
             .then(response => response.json())
             .then(data => {
-                const vrsteLista = document.getElementById('vrste-lista');
-                vrsteLista.innerHTML = ''; // Očisti listu prije dodavanja novih podataka
+                const vrsteTabela = document.getElementById('vrste-tabela');
+                vrsteTabela.innerHTML = ''; // Očisti tablicu prije dodavanja novih podataka
 
+                // Dodaj zaglavlje tablice
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                <tr>
+                    <th>Naziv vrste</th>
+                </tr>
+            `;
+                vrsteTabela.appendChild(thead);
+
+                // Dodaj redove tablice
+                const tbody = document.createElement('tbody');
                 data.forEach(vrsta => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    listItem.innerHTML = `<span>${vrsta.nazivVrste}</span>`;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td>${vrsta.nazivVrste}</td>
+
+                `;
 
                     // Dodaj događaj klikanja na redak
-                    listItem.addEventListener('click', () => {
+                    tr.addEventListener('click', () => {
                         // Popuni formu kada korisnik klikne na redak
                         popuniFormu(vrsta.id);
                     });
 
-                    vrsteLista.appendChild(listItem);
+                    tbody.appendChild(tr);
                 });
+                vrsteTabela.appendChild(tbody);
             })
             .catch(error => console.error('Greška pri dohvaćanju vrsta:', error));
     }
+
 
 
 
