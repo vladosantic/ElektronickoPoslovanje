@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration and Login System</title>
+    <link th:href="@{static/css/style.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>udomi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Bootstrap CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Optional: You can also include Bootstrap's JavaScript and dependencies if needed -->
+    <!-- Bootstrap JS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <!-- Popper.js (required for Bootstrap's JS) via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <!-- jQuery (required for Bootstrap's JS) via CDN -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Include SockJS and Stomp.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.2/dist/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
+"></script>
+
+
+
+</head>
+<body th:style="'background-image: url(' + @{/images/paw2.png} + '); background-size: cover;'">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container">
+
+        <!-- Logo/Brand -->
+        <a class="navbar-brand" href="/index">
+            <img th:src="@{/images/udomilogo.png}" alt="Logo" height="45" class="d-inline-block align-top">
+        </a>
+
+        <!-- Navbar Toggler for mobile -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/index}"><strong>Početna</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/udomi}"><strong>Udomi</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/zivotinje}"><strong>Životinje</strong></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/vrsta}"><strong>Vrsta</strong></a>
+                </li>
+            </ul>
+
+            <!-- Displaying Logged User's Name and Logout -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}"><strong>Odjava</strong></a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<br /><br />
+<div class="container mt-5">
+    <h2>Vrste Životinja</h2>
+
+    <!-- Lista vrsta -->
+    <ul id="vrste-lista" class="list-group mb-3"></ul>
+
+
+
+    <!-- Forma za dodavanje/ažuriranje -->
+    <form id="vrsta-forma" class="mt-3">
+        <div class="form-group">
+            <label for="nazivVrste">Naziv vrste:</label>
+            <input type="text" class="form-control" id="nazivVrste" required>
+            <input type="hidden" class="form-control" id="idVrste" >
+        </div>
+        <button type="button" class="btn btn-success" onclick="dodajVrstu()">Dodaj</button>
+        <button type="button" class="btn btn-warning" onclick="azurirajFormu()">Ažuriraj</button>
+        <button type="button" class="btn btn-danger" onclick="obrisiVrstu()">Obriši</button>
+    </form>
+</div>
+<!--Footer-->
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">
+
+    <div class="container text-center p-3" >
+        © 2024 Copyright:
+        <a class="text-light" href="/index">udomi.ba</a>
+    </div>
+
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Funkcija za dohvat vrsta s API-ja i prikaz u listi
+    // Ažurirana funkcija za prikaz vrsta s dodatkom događaja na redak
+    function prikaziVrste() {
+        fetch('http://localhost:8080/api/vrsta')
+            .then(response => response.json())
+            .then(data => {
+                const vrsteLista = document.getElementById('vrste-lista');
+                vrsteLista.innerHTML = ''; // Očisti listu prije dodavanja novih podataka
+
+                data.forEach(vrsta => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `<span>${vrsta.nazivVrste}</span>`;
+
+                    // Dodaj događaj klikanja na redak
+                    listItem.addEventListener('click', () => {
+                        // Popuni formu kada korisnik klikne na redak
+                        popuniFormu(vrsta.id);
+                    });
+
+                    vrsteLista.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Greška pri dohvaćanju vrsta:', error));
+    }
+
+
+
+    // Funkcija za popunjavanje forme s podacima odabrane vrste
+    function popuniFormu(id) {
+        fetch(`http://localhost:8080/api/vrsta/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('nazivVrste').value = data.nazivVrste;
+                document.getElementById('idVrste').value = data.id;
+            })
+            .catch(error => console.error('Greška pri dohvaćanju vrste za uređivanje:', error));
+    }
+
+    // Funkcija za dodavanje nove vrste
+    function dodajVrstu() {
+        const nazivVrste = document.getElementById('nazivVrste').value;
+
+        fetch('http://localhost:8080/api/vrsta', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nazivVrste }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Vrsta dodana:', data);
+                document.getElementById('nazivVrste').value = '';
+                document.getElementById('idVrste').value = '';
+                prikaziVrste();
+            })
+            .catch(error => console.error('Greška pri dodavanju vrste:', error));
+    }
+
+    // Funkcija za ažuriranje vrste
+    function azurirajFormu() {
+        const nazivVrste = document.getElementById('nazivVrste').value;
+        const id = document.getElementById('idVrste').value;
+
+        // Provjerite je li naziv vrste unesen
+        if (!nazivVrste) {
+            alert('Unesite naziv vrste.');
+            return;
+        }
+
+        // Pripremite podatke za slanje PUT zahtjeva
+        const formData = {
+            id: parseInt(id),
+            nazivVrste: nazivVrste
+        };
+
+        // Pošaljite PUT zahtjev na API
+        fetch(`http://localhost:8080/api/vrsta/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('nazivVrste').value = '';
+                    document.getElementById('idVrste').value = '';
+                    prikaziVrste();
+                } else {
+                    console.error('Greška pri ažuriranju vrste:', response.status);
+                    alert('Pogreška prilikom ažuriranja vrste.');
+                }
+            })
+            .catch(error => {
+                console.error('Greška pri ažuriranju vrste:', error);
+                alert('Pogreška prilikom ažuriranja vrste.');
+            });
+    }
+
+
+
+    function obrisiVrstu() {
+        // Pitaj korisnika jeste li sigurni da želi obrisati
+        const potvrda = confirm('Jeste li sigurni da želite obrisati ovu vrstu životinje?');
+        const id = document.getElementById('idVrste').value;
+
+        if (potvrda) {
+            // Ako je korisnik potvrdio brisanje
+            fetch(`http://localhost:8080/api/vrsta/${id}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Vrsta obrisana');
+                        document.getElementById('nazivVrste').value = '';
+                        document.getElementById('idVrste').value = '';
+                        prikaziVrste();
+                    } else {
+                        console.error('Greška pri brisanju vrste:', response.status);
+                        // Prikazi obavijest o grešci
+                        alert('Pogreška pri brisanju vrste.');
+                    }
+                })
+                .catch(error => console.error('Greška pri brisanju vrste:', error));
+        }
+    }
+
+
+
+
+
+    // Pri učitavanju stranice, prikaži vrste
+    document.addEventListener('DOMContentLoaded', prikaziVrste);
+</script>
+
+</body>
+</html>
