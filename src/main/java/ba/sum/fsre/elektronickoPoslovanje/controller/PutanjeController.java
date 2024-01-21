@@ -109,5 +109,11 @@ public class PutanjeController {
 
         return "vrsta/vrsta";
     }
+    @GetMapping("/lokacija")
+    public String lokacija() {
+
+
+        return "lokacija";
+    }
 
 }
