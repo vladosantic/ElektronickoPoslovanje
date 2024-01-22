@@ -72,6 +72,28 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
             font-weight: bold;
             margin-right: 5px;
         }
+        #comments-container {
+            margin-top: 20px;
+        }
+
+        .comment {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment p {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .comment small {
+            color: #888;
+        }
+
 
 
     </style>
@@ -167,9 +189,27 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
         <button id="deleteButton" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal" style="display: none;">Obriši objavu</button>
     </div>
 
+    <!-- Komentari -->
+    <div class="mt-3">
+        <h2>Komentari</h2>
 
+        <!-- Container for displaying comments -->
+        <div id="comments-container"></div>
 
+        <!-- Form for adding a new comment -->
+        <form id="comment-form">
+            <div class="form-group">
+                <label for="comment">Dodaj komentar:</label>
+                <textarea class="form-control" id="comment" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-warning">Dodaj</button>
+        </form>
     </div>
+
+
+
+
+</div>
 
 
 
@@ -183,78 +223,137 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 
 
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // Dohvati objavaId iz Thymeleaf atributa
-        var objavaId = [[${objavaId}]]
+    document.addEventListener("DOMContentLoaded",
+        function () {
+            // Dohvati objavaId iz Thymeleaf atributa
+            var objavaId = [[${objavaId}]]
 
+            fetchComments(objavaId);
 
+            // Dohvati podatke o objavi putem Fetch API-ja
+            fetch("http://localhost:8080/api/objava/" + objavaId)
+                .then(response => response.json())
+                .then(async data => {
+                    const loggedInUserId = await fetchLoggedInUserId();
+                    const updateButton = document.getElementById("updateButton");
+                    const deleteButton = document.getElementById("deleteButton");
 
-        // Dohvati podatke o objavi putem Fetch API-ja
-        fetch("http://localhost:8080/api/objava/" + objavaId)
-            .then(response => response.json())
-            .then(async data => {
-                const loggedInUserId = await fetchLoggedInUserId();
-                const updateButton = document.getElementById("updateButton");
-                const deleteButton = document.getElementById("deleteButton");
+                    if (loggedInUserId === data.korisnikId) {
+                        updateButton.style.display = "inline-block";
+                        deleteButton.style.display = "inline-block";
+                    }
 
-                if (loggedInUserId === data.korisnikId) {
-                    updateButton.style.display = "inline-block";
-                    deleteButton.style.display = "inline-block";
-                }
+                    // Izračunaj razliku između trenutnog vremena i data.datumObjave
+                    const currentTime = new Date().getTime();
+                    const timeDifference = currentTime - new Date(data.datumObjave).getTime();
 
-                // Izračunaj razliku između trenutnog vremena i data.datumObjave
-                const currentTime = new Date().getTime();
-                const timeDifference = currentTime - new Date(data.datumObjave).getTime();
-
-                // Formatiraj razliku pomoću funkcije formatTimeDifference
-                const formattedTimeDifference = formatTimeDifference(timeDifference);
-                // Ažuriraj HTML s dohvaćenim podacima
-                document.getElementById("naslov").innerText = data.tekstObjave;
-                document.getElementById("imeLokacije").innerText = data.imeLokacije;
-                document.getElementById("imeZivotinje").innerText = data.imeZivotinje;
-                document.getElementById("imePrezime").innerText = data.imePrezime;
-                document.getElementById("datumObjave").innerText = formattedTimeDifference;
-                document.getElementById("imeZivotinje").innerHTML += `
+                    // Formatiraj razliku pomoću funkcije formatTimeDifference
+                    const formattedTimeDifference = formatTimeDifference(timeDifference);
+                    // Ažuriraj HTML s dohvaćenim podacima
+                    document.getElementById("naslov").innerText = data.tekstObjave;
+                    document.getElementById("imeLokacije").innerText = data.imeLokacije;
+                    document.getElementById("imeZivotinje").innerText = data.imeZivotinje;
+                    document.getElementById("imePrezime").innerText = data.imePrezime;
+                    document.getElementById("datumObjave").innerText = formattedTimeDifference;
+                    document.getElementById("imeZivotinje").innerHTML += `
                 <button class="btn btn-outline-warning btn-sm ml-2" onclick="prikaziZivotinjuInfo(${data.zivotinjaId})">Više informacija</button>
 `;
-                document.getElementById("imeLokacije").innerHTML += `
+                    document.getElementById("imeLokacije").innerHTML += `
                 <button class="btn btn-outline-warning btn-sm ml-2" onClick="prikaziLokacijuInfo(${data.lokacijaId})">Više
                     informacija</button>`;
 
 
-
-                // Dodaj event listener na delete dugme
-                document.getElementById("deleteButton").addEventListener("click", function () {
-                    // Prikaži potvrdu prije brisanja
-                    var confirmDelete = confirm("Jeste li sigurni da želite obrisati ovu objavu?");
-                    if (confirmDelete) {
-                        // Ako korisnik potvrdi brisanje, pošalji DELETE zahtjev na API
-                        fetch("http://localhost:8080/api/objava/" + objavaId, {
-                            method: "DELETE"
-                        })
-                            .then(response => {
-                                if (response.ok) {
-
-                                    window.location.href = "http://localhost:8080/udomi";
-                                } else {
-                                    console.error("Brisanje nije uspjelo.");
-                                }
+                    // Dodaj event listener na delete dugme
+                    document.getElementById("deleteButton").addEventListener("click", function () {
+                        // Prikaži potvrdu prije brisanja
+                        var confirmDelete = confirm("Jeste li sigurni da želite obrisati ovu objavu?");
+                        if (confirmDelete) {
+                            // Ako korisnik potvrdi brisanje, pošalji DELETE zahtjev na API
+                            fetch("http://localhost:8080/api/objava/" + objavaId, {
+                                method: "DELETE"
                             })
-                            .catch(error => console.error("Error:", error));
+                                .then(response => {
+                                    if (response.ok) {
+
+                                        window.location.href = "http://localhost:8080/udomi";
+                                    } else {
+                                        console.error("Brisanje nije uspjelo.");
+                                    }
+                                })
+                                .catch(error => console.error("Error:", error));
+                        }
+                    });
+                    document.getElementById("updateButton").addEventListener("click", function () {
+                        // Generiraj URL za uređivanje objave s odgovarajućim ID-om
+                        var editUrl = "http://localhost:8080/objava/uredjivanje/" + objavaId;
+
+                        // Preusmjeri korisnika na odabrani URL
+                        window.location.href = editUrl;
+                    });
+
+
+                })
+                .catch(error => console.error("Error:", error));
+
+
+
+            // Handle form submission for adding a new comment
+            document.getElementById("comment-form").addEventListener("submit", function (event) {
+                event.preventDefault();
+                addComment(objavaId);
+            });
+
+            const socket = new SockJS('http://localhost:8080/ws-endpoint');
+            const stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe(`/topic/commentUpdates/${objavaId}`, async function (update) {
+                    console.log('Received update:', update);
+
+                    const message = JSON.parse(update.body);
+                    console.log('Parsed message:', message);
+                    // Provjeravamo tip poruke i poduzimamo odgovarajuće akcije
+                    if (message.messageType === 'New post added') {
+                        fetchComments(objavaId);
+                    }
+                    if (message.messageType === 'Delete post') {
+
+                        const commentElement = document.getElementById(`comment-${message.id}`);
+                        if (commentElement) {
+                            commentElement.remove();
+                        }
+
                     }
                 });
-                document.getElementById("updateButton").addEventListener("click", function () {
-                    // Generiraj URL za uređivanje objave s odgovarajućim ID-om
-                    var editUrl = "http://localhost:8080/objava/uredjivanje/" + objavaId;
+            });
 
-                    // Preusmjeri korisnika na odabrani URL
-                    window.location.href = editUrl;
+        });
+
+    function getUserById(userId) {
+        // Kreirajte URL za GET zahtjev
+        const url = `http://localhost:8080/api/users/${userId}`;
+
+        // Vrati novi Promise
+        return new Promise((resolve, reject) => {
+            // Posaljite GET zahtjev
+            fetch(url)
+                .then(response => {
+                    // Provjeri odgovor
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(userData => {
+                    // Riješi Promise s podacima o korisniku
+                    resolve(userData);
+                })
+                .catch(error => {
+                    // Odbaci Promise s greškom
+                    reject(error);
                 });
-
-
-            })
-            .catch(error => console.error("Error:", error));
-    });
+        });
+    }
 
     function formatTimeDifference(timeDifference) {
         const seconds = Math.floor(timeDifference / 1000);
@@ -343,6 +442,127 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
         }
     }
 
+    function fetchComments(objavaId) {
+        fetch("http://localhost:8080/api/komentar")
+            .then(response => response.json())
+            .then(comments => {
+
+                const filteredComments = filterCommentsByObjavaId(comments, objavaId);
+                displayComments(filteredComments);
+            })
+            .catch(error => console.error("Error fetching comments:", error));
+    }
+
+    function filterCommentsByObjavaId(comments, objavaId) {
+        return comments.filter(comment => comment.objavaId === objavaId);
+    }
+
+    async function displayComments(comments) {
+        const commentsContainer = document.getElementById("comments-container");
+
+        // Clear existing comments
+        commentsContainer.innerHTML = "";
+
+        // Check if there are no comments
+        if (comments.length === 0) {
+            commentsContainer.innerHTML = "<p>Nema komentara.</p>";
+            return;
+        }
+        const currentTime = new Date().getTime();
+        const loggedInUserId = await fetchLoggedInUserId();
+
+        // Build HTML string for comments
+        const commentsHTML = comments.map(comment => {
+            const canDeleteComment = loggedInUserId === comment.korisnikId;
+
+            return `
+           <div class="comment mb-3" id="comment-${comment.id}" style="background-color: white; border-radius: 10px; padding: 15px;">
+    <div class="d-flex">
+
+        <!-- Comment Content -->
+        <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- User Name and Comment Text -->
+                <div>
+                    <p class="mb-1"><strong>${comment.imePrezime}</strong>: ${comment.tekstKomentara}</p>
+                    <small>${formatTimeDifference(currentTime - new Date(comment.datumKomentara).getTime())}</small>
+                </div>
+
+                <!-- Delete Button -->
+                 ${canDeleteComment ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteComment(${comment.id})">Obriši</button>` : ''}
+                   </div>
+        </div>
+    </div>
+</div>
+
+
+        `;
+        }).join('');
+
+        // Set the HTML of the container
+        commentsContainer.innerHTML = commentsHTML;
+    }
+
+
+
+
+
+    async function addComment(objavaId) {
+        const commentText = document.getElementById("comment").value;
+        const loggedInUserId = await fetchLoggedInUserId(); // Assuming you have a function to fetch the logged-in user ID
+
+        const newComment = {
+            objavaId: {
+                id: objavaId
+            },
+            tekstKomentara: commentText,
+            datumKomentara: new Date().toISOString(), // Use the current date and time
+            korisnikId: {
+                id: loggedInUserId
+            }
+            // Include other fields like korisnikId, etc., based on your API requirements
+        };
+
+        fetch("http://localhost:8080/api/komentar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newComment)
+        })
+            .then(response => response.json())
+            .then(addedComment => {
+
+                //fetchComments(objavaId);
+            })
+            .catch(error => console.error("Error adding comment:", error));
+
+        // Clear the comment input field
+        document.getElementById("comment").value = "";
+    }
+    function deleteComment(commentId) {
+        fetch(`http://localhost:8080/api/komentar/${commentId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Komentar obrisan")
+                } else {
+                    console.error("Brisanje komentara nije uspjelo.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+
+
+
+
+
+
 
 </script>
 
@@ -351,7 +571,7 @@ https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js
 
     <!--Footer-->
 </div>
-<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig fixed-bottom">
+<footer class="bg-warning text-center text-lg-start text-white mt-5 animate__animated animate__fadeInRightBig">
     <div class="container text-center p-3">
         © 2024 Copyright:
         <a class="text-light" href="/index">udomi.ba</a>
