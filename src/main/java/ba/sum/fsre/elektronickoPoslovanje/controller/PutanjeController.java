@@ -115,5 +115,11 @@ public class PutanjeController {
 
         return "lokacija";
     }
+    @GetMapping("/savjetnik")
+    public String savjetnik() {
+
+
+        return "chat";
+    }
 
 }
