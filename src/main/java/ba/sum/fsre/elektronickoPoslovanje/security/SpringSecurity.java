@@ -32,11 +32,15 @@ public class SpringSecurity {
                 .authorizeRequests((authorize) ->
                         authorize.requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/index").permitAll()
+                                .requestMatchers("/images/**").permitAll()
+                                .requestMatchers("/css/**").permitAll()
                                 .requestMatchers("/users").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/chat**").permitAll()
+                                .anyRequest().authenticated()
                 ).formLogin(
                         form -> form
                                 .loginPage("/login")
